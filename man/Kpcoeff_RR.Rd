@@ -4,7 +4,7 @@
 \alias{Kpcoeff_RR}
 \title{Prediction of tissue-prediction partition coefficient using R&R method}
 \usage{
-Kpcoeff_RR(logP, pKa = 0, fup, BP = 1, type = 1, dat)
+Kpcoeff_RR(logP, pKa = 0, fup, BP = 1, type = 1, dattype = 0)
 }
 \arguments{
 \item{logP}{Partition coefficient}
@@ -17,7 +17,7 @@ Kpcoeff_RR(logP, pKa = 0, fup, BP = 1, type = 1, dat)
 
 \item{type}{Neutral/acid/base}
 
-\item{dat}{Human physiology dataset}
+\item{dattype}{Human physiology dataset}
 }
 \value{
 A list of tissue partition coefficient in each organ
@@ -26,6 +26,6 @@ A list of tissue partition coefficient in each organ
 Prediction of tissue-prediction partition coefficient using R&R method
 }
 \examples{
-Kpcoeff_RR(2.7, 6, 0.9, 1, 1, dat_uni)
+Kpcoeff_RR(2.7, 6, 0.9, 1, 1, 0)
 
 }

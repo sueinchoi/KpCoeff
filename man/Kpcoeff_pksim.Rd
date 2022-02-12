@@ -4,14 +4,14 @@
 \alias{Kpcoeff_pksim}
 \title{Prediction of tissue-prediction partition coefficient using PK-sim method}
 \usage{
-Kpcoeff_pksim(logP, fup, dat)
+Kpcoeff_pksim(logP, fup, dattype = 0)
 }
 \arguments{
 \item{logP}{Partition coefficient}
 
 \item{fup}{Plasma unbound fraction}
 
-\item{dat}{Human physiology dataset}
+\item{dattype}{Human physiology dataset}
 }
 \value{
 A list of tissue partition coefficient in each organ
@@ -20,6 +20,6 @@ A list of tissue partition coefficient in each organ
 Prediction of tissue-prediction partition coefficient using PK-sim method
 }
 \examples{
-Kpcoeff_pksim(2.7,0.9,dat_uni)
+Kpcoeff_pksim(2.7,0.9,0)
 
 }

@@ -6,16 +6,22 @@
 #' @param fup Plasma unbound fraction
 #' @param BP Blood-plasma ratio
 #' @param type Neutral/acid/base
-#' @param dat Human physiology dataset
+#' @param dattype Human physiology dataset
 #' @importFrom rlang .data
 #'
 #' @return A list of tissue partition coefficient in each organ
 #' @export
 #'
 #' @examples
-#' Kpcoeff_PT(2.7, 6, 0.9, 1, 1, dat_uni)
+#' Kpcoeff_PT(2.7, 6, 0.9, 1, 1, 0)
 #'
-Kpcoeff_PT <- function(logP, pKa, fup, BP=1, type=1, dat){
+Kpcoeff_PT <- function(logP, pKa, fup, BP=1, type=1, dattype=0){
+
+  if(dattype == 0){
+    dat <- dat_PT
+  } else {
+    dat <- dat_uni
+  }
 
   dat_all <- dat %>% dplyr::filter(!.data$tissue %in% c("Plasma","Adipose","RBCs"))
 

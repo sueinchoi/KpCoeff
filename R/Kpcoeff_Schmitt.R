@@ -5,17 +5,22 @@
 #' @param pKa Acid dissociation
 #' @param fup Plasma unbound fraction
 #' @param type Neutral/acid/base
-#' @param dat Human physiology dataset
+#' @param dattype Human physiology dataset
 #' @importFrom rlang .data
 #' @return A list of tissue partition coefficient in each organ
 #' @export
 #'
 #' @examples
-#' Kpcoeff_Schmitt(2.7, 6, 0.9, 1, dat_uni)
+#' Kpcoeff_Schmitt(2.7, 6, 0.9, 1, 0)
 #'
-Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1, dat){
+Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1, dattype=0){
   #logMA is the log of membrane affinity = phosphatidylcholine:water (neutral phospholipid:water) partition coefficient;
   #we can use the available measurement of lipophilicity instead (logP or logD); from Schmitt, Walter (2008)
+  if(dattype == 0){
+    dat <- dat_Schmitt
+  } else {
+    dat <- dat_uni
+  }
 
   dat_all <- dat %>% dplyr::filter(!.data$tissue %in% c("RBCs", "Plasma"))  #df for all tissues except for adipose and RBCs
 

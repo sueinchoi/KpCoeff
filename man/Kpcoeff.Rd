@@ -4,7 +4,7 @@
 \alias{Kpcoeff}
 \title{Calculation of tissue-plasma partition coefficient}
 \usage{
-Kpcoeff(logP, pKa, fup, BP, type = 3, pred = "P&T", dat)
+Kpcoeff(logP, pKa, fup, BP, type = 3, pred = "P&T", dattype = 0)
 }
 \arguments{
 \item{logP}{partition coefficient (octanol-to-water)}
@@ -19,7 +19,7 @@ Kpcoeff(logP, pKa, fup, BP, type = 3, pred = "P&T", dat)
 
 \item{pred}{Prediction method}
 
-\item{dat}{human physiology dataset}
+\item{dattype}{human physiology dataset}
 }
 \value{
 A list of partition coefficient in each organ
@@ -28,6 +28,6 @@ A list of partition coefficient in each organ
 It calculates tissue-plasma partition coefficient using the specified prediction method and the human physiology dataset
 }
 \examples{
-Kpcoeff(2.6, 2, 0.9, 1.5, 2, "P&T", dat_PT)
+Kpcoeff(2.6, 2, 0.9, 1.5, 2, "P&T", 0)
 
 }

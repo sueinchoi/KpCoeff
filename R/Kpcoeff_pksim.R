@@ -3,15 +3,20 @@
 #'
 #' @param logP Partition coefficient
 #' @param fup Plasma unbound fraction
-#' @param dat Human physiology dataset
+#' @param dattype Human physiology dataset
 #' @importFrom rlang .data
 #' @return A list of tissue partition coefficient in each organ
 #' @export
 #'
 #' @examples
-#' Kpcoeff_pksim(2.7,0.9,dat_uni)
+#' Kpcoeff_pksim(2.7,0.9,0)
 #'
-Kpcoeff_pksim <- function(logP, fup, dat){
+Kpcoeff_pksim <- function(logP, fup, dattype=0){
+  if(dattype == 0){
+    dat <- dat_pksim
+  } else {
+    dat <- dat_uni
+  }
   #logMA is the log of membrane affinity = phosphatidylcholin:water (neutral phospholipid:water) partition coefficient;
   #we can use the available measurement of lipophilicity instead (logP or logD); from Schmitt, Walter (2008)
 

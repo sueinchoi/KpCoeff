@@ -4,7 +4,7 @@
 \alias{Kpcoeff_Schmitt}
 \title{Prediction of tissue-prediction partition coefficient using Schmitt method}
 \usage{
-Kpcoeff_Schmitt(logP, pKa, fup, type = 1, dat)
+Kpcoeff_Schmitt(logP, pKa, fup, type = 1, dattype = 0)
 }
 \arguments{
 \item{logP}{Partition coefficient}
@@ -15,7 +15,7 @@ Kpcoeff_Schmitt(logP, pKa, fup, type = 1, dat)
 
 \item{type}{Neutral/acid/base}
 
-\item{dat}{Human physiology dataset}
+\item{dattype}{Human physiology dataset}
 }
 \value{
 A list of tissue partition coefficient in each organ
@@ -24,6 +24,6 @@ A list of tissue partition coefficient in each organ
 Prediction of tissue-prediction partition coefficient using Schmitt method
 }
 \examples{
-Kpcoeff_Schmitt(2.7, 6, 0.9, 1, dat_uni)
+Kpcoeff_Schmitt(2.7, 6, 0.9, 1, 0)
 
 }

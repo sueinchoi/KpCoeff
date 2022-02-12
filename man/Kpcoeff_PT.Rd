@@ -4,7 +4,7 @@
 \alias{Kpcoeff_PT}
 \title{Prediction of tissue-prediction partition coefficient using Poulin&Theil method}
 \usage{
-Kpcoeff_PT(logP, pKa, fup, BP = 1, type = 1, dat)
+Kpcoeff_PT(logP, pKa, fup, BP = 1, type = 1, dattype = 0)
 }
 \arguments{
 \item{logP}{Partition coefficient}
@@ -17,7 +17,7 @@ Kpcoeff_PT(logP, pKa, fup, BP = 1, type = 1, dat)
 
 \item{type}{Neutral/acid/base}
 
-\item{dat}{Human physiology dataset}
+\item{dattype}{Human physiology dataset}
 }
 \value{
 A list of tissue partition coefficient in each organ
@@ -26,6 +26,6 @@ A list of tissue partition coefficient in each organ
 Prediction of tissue-prediction partition coefficient using Poulin&Theil method
 }
 \examples{
-Kpcoeff_PT(2.7, 6, 0.9, 1, 1, dat_uni)
+Kpcoeff_PT(2.7, 6, 0.9, 1, 1, 0)
 
 }
