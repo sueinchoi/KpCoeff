@@ -122,7 +122,7 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
   
   
   # Assign the moderate to strong bases type_calc=1 and everything else type_calc=2 
-  type_calc <- ifelse((type==3 & pKa[1]>7) | (type==5 & pKa[1] >7) | (type==8 & pKa[1] > 7) | (type==9 & pKa[3]>7) | (type==10 & pKa[2]>7), 1,2)
+  type_calc <- ifelse((type==3 & pKa[1]>7) | type==5 & pKa[1] >7) | (type==8 & pKa[1] > 7) | (type==9 & pKa[3]>7) | (type==10 & pKa[2]>7), 1,2)
   
   # Re-assign the neutrals type_calc=3
   if(type==1){type_calc=3}  #neutrals
