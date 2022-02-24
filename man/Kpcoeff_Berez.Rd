@@ -9,15 +9,15 @@ Kpcoeff_Berez(logP, pKa, fup, BP = 1, type = 1, dattype = 0)
 \arguments{
 \item{logP}{Partition coefficient}
 
-\item{pKa}{Acid dissociation}
+\item{pKa}{Acid dissociation constant (for ampholyte or zwitterion, enter Acid pKa first)}
 
 \item{fup}{Plasma unbound fraction}
 
 \item{BP}{Blood-plasma ratio}
 
-\item{type}{Neutral/acid/base}
+\item{type}{Neutral(1)/acid(2)/base(3)/diprotic acid(4)/diprotic base(5)/zwitterion(ampholyte)(6)}
 
-\item{dattype}{Human physiology dataset}
+\item{dattype}{Human physiology dataset(0 - original dataset, 1 - unified dataset)}
 }
 \value{
 A list of tissue partition coefficient in each organ

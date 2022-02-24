@@ -4,12 +4,12 @@
 #' It calculates tissue-plasma partition coefficient using the specified prediction method and the human physiology dataset
 #'
 #' @param logP partition coefficient (octanol-to-water)
-#' @param pKa Acid dissociation constant
+#' @param pKa Acid dissociation constant (for ampholyte or zwitterion, enter Acid pKa first)
 #' @param fup Plasma unbound fraction
 #' @param BP Blood-to-plasma ratio
-#' @param type Neutral/base/acid/zwitterion
-#' @param pred Prediction method
-#' @param dattype human physiology dataset
+#' @param type Neutral(1)/acid(2)/base(3)/diprotic acid(4)/diprotic base(5)/zwitterion(ampholyte)(6)
+#' @param pred Prediction method (Poulin&Theil - "P&T", Rowland&Rowdgers - "R&R", Berezhesky - "Berez", PKsim - "pksim", Schmitt - "Schmitt")
+#' @param dattype Human physiology dataset(0 - original dataset, 1 - unified dataset)
 #'
 #' @return A list of partition coefficient in each organ
 #' @export

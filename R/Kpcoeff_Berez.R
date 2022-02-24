@@ -2,11 +2,11 @@
 #' Prediction of tissue-prediction partition coefficient using Berez method
 #'
 #' @param logP Partition coefficient
-#' @param pKa Acid dissociation
+#' @param pKa Acid dissociation constant (for ampholyte or zwitterion, enter Acid pKa first)
 #' @param fup Plasma unbound fraction
 #' @param BP Blood-plasma ratio
-#' @param type Neutral/acid/base
-#' @param dattype Human physiology dataset
+#' @param type Neutral(1)/acid(2)/base(3)/diprotic acid(4)/diprotic base(5)/zwitterion(ampholyte)(6)
+#' @param dattype Human physiology dataset(0 - original dataset, 1 - unified dataset)
 #' @importFrom rlang .data
 #' @return A list of tissue partition coefficient in each organ
 #' @export

@@ -9,17 +9,17 @@ Kpcoeff(logP, pKa, fup, BP, type = 3, pred = "P&T", dattype = 0)
 \arguments{
 \item{logP}{partition coefficient (octanol-to-water)}
 
-\item{pKa}{Acid dissociation constant}
+\item{pKa}{Acid dissociation constant (for ampholyte or zwitterion, enter Acid pKa first)}
 
 \item{fup}{Plasma unbound fraction}
 
 \item{BP}{Blood-to-plasma ratio}
 
-\item{type}{Neutral/base/acid/zwitterion}
+\item{type}{Neutral(1)/acid(2)/base(3)/diprotic acid(4)/diprotic base(5)/zwitterion(ampholyte)(6)}
 
-\item{pred}{Prediction method}
+\item{pred}{Prediction method (Poulin&Theil - "P&T", Rowland&Rowdgers - "R&R", Berezhesky - "Berez", PKsim - "pksim", Schmitt - "Schmitt")}
 
-\item{dattype}{human physiology dataset}
+\item{dattype}{Human physiology dataset(0 - original dataset, 1 - unified dataset)}
 }
 \value{
 A list of partition coefficient in each organ
