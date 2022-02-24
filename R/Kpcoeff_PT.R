@@ -23,7 +23,7 @@ Kpcoeff_PT <- function(logP, pKa, fup, BP=1, type=1, dattype=0){
     dat <- dat_uni
   }
 
-    dat_all <- dat %>% filter(!tissue %in% c("Plasma", "Adipose", "RBCs"))
+    dat_all <- dat %>% filter(!.data$tissue %in% c("Plasma", "Adipose", "RBCs"))
 
     n <- length(dat$tissue)
     Kp_all <- vector(mode = "numeric", length = n)
