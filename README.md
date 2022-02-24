@@ -7,7 +7,7 @@ KpCoeff is an R package for prediction of tissue-plasma partition coefficients (
 
 Unified dataset is from the reference 
 
-[![Reference](Reference/903.full.pdf)
+[Reference](Reference/903.full.pdf)
 
 ## Installation
 
