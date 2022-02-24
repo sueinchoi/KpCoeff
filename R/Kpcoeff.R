@@ -23,7 +23,7 @@ Kpcoeff <- function(logP, pKa, fup, BP, type = 3, pred = "P&T", dattype = 0) {
     } else if (pred == "Berez") { # Berezhkovskiy
       pcoeff <- Kpcoeff_Berez(logP = logP, pKa = pKa, fup = fup, BP = BP, type = type, dattype = dattype)
     } else if (pred == "pksim") { # standard PK-Sim, Willmann et al. 2008
-      pcoeff <- Kpcoeff_pksim(logP = logP, fup = fup, dattype = dat_pksim)
+      pcoeff <- Kpcoeff_pksim(logP = logP, fup = fup, dattype = dattype)
     } else if (pred == "Schmitt") { # Schmitt, Walter 2008
       pcoeff <- Kpcoeff_Schmitt(logP = logP, pKa = pKa, fup = fup, type = type, dattype = dattype)
     } else {
