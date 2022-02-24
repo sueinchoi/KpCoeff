@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' Kpcoeff(2.6, 2, 0.9, 1.5, 2, "P&T", 0)
-#'
+#' Kpcoeff(2.6, c(1.1, 8), 0.5, 1, 6, "R&R", 1)
 Kpcoeff <- function(logP, pKa, fup, BP, type = 3, pred = "P&T", dattype = 0) {
     if (pred == "P&T") {
       pcoeff <- Kpcoeff_PT(logP = logP, pKa = pKa, fup = fup, BP = BP, type = type, dattype = dattype)
