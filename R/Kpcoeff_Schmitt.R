@@ -22,8 +22,7 @@ Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1, dattype=0){
     dat <- dat_uni
   }
 
-  
-  dat_all <- dat %>% filter(!tissue %in% c("RBCs", "Plasma"))  #df for all tissues except for adipose and RBCs
+  dat_all <- dat %>% dplyr::filter(!.data$tissue %in% c("RBCs", "Plasma"))  #df for all tissues except for adipose and RBCs
 
 
   logMA <- logP  #in case we don't have a direct logMA
