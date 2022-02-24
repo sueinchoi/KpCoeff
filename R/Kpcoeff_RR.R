@@ -41,9 +41,9 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
   #Calculate Kp values
   Kpu_bc <- (HCT - 1 + BP)/(HCT*fup)
   
-  pKa <- case_when(type == 6 ~ sort(pKa)
-                   type == 7 ~ sort(pKa, desc = T)
-                   pKa)
+  pKa <- case_when(type == 6 ~ sort(pKa),
+                   type == 7 ~ sort(pKa, desc = T),
+                   TRUE ~ pKa)
 
   type <- ifelse(type >= 7, type - 1, type)
 
