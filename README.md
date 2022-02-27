@@ -1,5 +1,5 @@
 
-# mrgsolve <img align="right" src = "man/figures/mrgsolve_sticker_812418_1.png" width="135px">
+# KpCoeff <img align="right" src = "man/figures/mrgsolve_sticker_812418_1.png" width="135px">
 
 KpCoeff is an R package for prediction of tissue-plasma partition coefficients (Kp) using published method with published/unified dataset. KpCoeff is free and open-source software.
 
@@ -7,7 +7,7 @@ KpCoeff is an R package for prediction of tissue-plasma partition coefficients (
 
 Unified dataset is from the reference 
 
-[Reference](Reference/903.full.pdf)
+[Reference](https://doi.org/10.1124/dmd.120.090498)
 
 ## Installation
 
