@@ -90,5 +90,3 @@ Kpcoeff_PT <- function(logP, pKa, fup, BP=1, type=1, dattype=0){
 }
 
 
-Kpcoeff_PT(5, 0.1, 0.1, 1, 1, 1)
-

@@ -42,5 +42,3 @@ Kpcoeff_pksim <- function(logP, fup, dattype=0){
 
   return(Kp)
 }
-
-Kpcoeff_pksim(5, 0.1, 1)

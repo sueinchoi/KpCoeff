@@ -141,6 +141,3 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
   return(Kp)
 }
 
-
-
-Kpcoeff_RR(2.15, 9.7, 0.879, 1.52, 3, 0)
