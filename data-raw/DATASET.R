@@ -9,3 +9,4 @@ dat_Schmitt <- read.csv("data-raw/PKSim_tissue_comp_Schmitt.csv") # data used by
 dat_pksim <- read.csv("data-raw/PKSim_tissue_comp_pksim.csv") # data used by PK-Sim for PK-Sim method
 
 usethis::use_data(dat_uni, dat_PT, dat_Berez, dat_RR, dat_Schmitt, dat_pksim, overwrite = TRUE, internal = TRUE)
+
