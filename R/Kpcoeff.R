@@ -32,3 +32,4 @@ Kpcoeff <- function(logP, pKa, fup, BP, type = 3, pred = "P&T", dattype = 0) {
 
   return(pcoeff)
 }
+

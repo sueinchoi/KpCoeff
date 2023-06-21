@@ -22,7 +22,8 @@ Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1, dattype=0){
     dat <- dat_uni
   }
 
-  dat_all <- dat %>% dplyr::filter(!.data$tissue %in% c("RBCs", "Plasma"))  #df for all tissues except for adipose and RBCs
+  
+  dat_all <- dat %>% filter(!tissue %in% c("RBCs", "Plasma"))  #df for all tissues except for adipose and RBCs
 
 
   logMA <- logP  #in case we don't have a direct logMA
@@ -62,7 +63,7 @@ Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1, dattype=0){
   else if(type==5){ # diprotic base
     F1 <- (1/(1+10^(pKa[1]-pH)))
     F2 <- (1/(1+10^(pKa[2]-pH)))
-    K_n_l <- K_n_pl*(F1*F2 + alpha*((1-F1)*F2 + F1*(1-F2)) + (1-F1)*(1-F2))
+    K_n_l <- K_n_pl*(F1*F2 + alpha*((1-F1)*F2 + F1*(1-F2) + (1-F1)*(1-F2)))
     K_a_pl <- K_n_pl*(F1*F2 + 20*((1-F1)*F2 + F1*(1-F2)) + (1-F1)*(1-F2))
   }
   else if(type==6){ # monoprotic acid monoprotic base (acid comes first)
