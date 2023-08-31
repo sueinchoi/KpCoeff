@@ -73,20 +73,27 @@ Kpcoeff_PT <- function(logP, pKa, fup, BP=1, type=1, dattype=0){
   fut <- 1/(1+((1-fup)/fup)*0.5)
   Kpt <- ((P*(Vnlt+0.3*Vpht)+(1*(Vwt+0.7*Vpht)))/(P*(Vnlp+0.3*Vphp)+(1*(Vwp+0.7*Vphp)))) * (fup/fut)
 
-  # Kp <- c(Kpad, Kpt)
-  # name <- dat2$tissue %>% substr(1,2) %>% tolower()
-  # name <- paste("Kp", name, sep="")
-  # uParam <- split(Kp, name)
+  Kp <- c(Kpad, Kpt)
+  name <- dat2$tissue %>% substr(1,2) %>% tolower()
+  name <- paste("Kp", name, sep="")
+  uParam <- split(Kp, name)
 
-  nms_all <- dat_all$tissue %>% substr(1,2) %>% tolower()
-  nms_all <- paste("Kp", nms_all, sep="")
-  nms <- c("Kpad",nms_all)
-  Kp <- as.list(c(Kpad,Kpt))
-  names(Kp) <- nms
+  #nms_all <- dat_all$tissue %>% substr(1,2) %>% tolower()
+  #nms_all <- paste("Kp", nms_all, sep="")
+  #nms <- c("Kpad",nms_all)
+  #Kp <- as.list(c(Kpad,Kpt))
+  #names(Kp) <- nms
 
-  return(Kp)
+  #return(Kp)
+
+  vols <- select(dat, FV)
+  prod <- vols*Kp
+
+  Vss <- sum(prod[1:11,]) + 0.0347*(BP - (1-0.45))/0.45 + vols[12,]
+  return(Vss)
+  }
 
 
-}
-
+library(dplyr)
+Kpcoeff_PT(3, 3, 0.1, 1, 1, 0)
 

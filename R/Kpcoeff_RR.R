@@ -15,129 +15,151 @@
 #' @examples
 #' Kpcoeff_RR(2.7, 6, 0.9, 1, 1, 0)
 #'
-Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
-  if(dattype == 0){
-    dat <- dat_RR
-  } else {
-    dat <- dat_uni
-  }
+#' 
 
-  dat_all <- dat[which(dat$tissue != "Plasma" & dat$tissue != "Adipose" & dat$tissue != "RBCs"), , drop = FALSE]
-  dat_ad <- dat[which(dat$tissue == "Adipose"), , drop = FALSE]
-  dat_rbc <- dat[which(dat$tissue == "RBCs"), , drop = FALSE]
-  dat_plas <- dat[which(dat$tissue == "Plasma"), , drop = FALSE]
+
+library(tidyverse)
+
+Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
+  dat_tissue <- read_csv('data-raw/Tissue_comp_R&R.csv')
+  
+  P_W <- 10^(logP)   # octonal:water partition coeff
+  # logP_OW <- 1.115*logP - 1.35 #oil:water partition coeff
+  # P_OW <- 10^(logP_OW)
+  P_OW <- 10^(logD)
+  Ka <- 10^(-pKa)
+ 
+
+  # PH setting
 
   pH_IW <- 7       #pH of intracellular tissue water
   pH_P <- 7.4      #pH of plasma
   pH_RBC <- 7.22    #pH of blood cells
-  P <- 10^(logP)   # octonal:water partition coeff
-  logP_OW <- 1.115*logP - 1.35 #oil:water partition coeff
-  P_OW <- 10^(logP_OW)
-  Ka <- 10^(-pKa)
-  HCT <- 0.45 #hematocrit
 
+  # Plasma data
 
-  #Calculate Kp values
+  fNLp <- 0.0023
+  fNPp <- 0.0013
+  
+  # RBC data
+
+  HCT <- 0.43 #hematocrit
+  
+  fNLb <- 0.0017
+  fNPb <- 0.0029
+  fIWb <- 0.603
+  fAPb <- 0.5
+
   Kpu_bc <- (HCT - 1 + BP)/(HCT*fup)
+
+  # Dissociation constant with tissue and AP
+  # Ka_AP <- (Kpu_bc - Z/Y*fIWb - (P*fNLb + (0.3*P + 0.7)*fNPb)/Y) * Y/fAPb/(Z - 1)
+
 
   X <- switch(type,
               #1-neutral
-              0,
+              1,
               #2-monoprotic acid
-              10^(pH_IW-pKa),
+              1 + 10^(pH_IW - pKa),
               #3-monoprotic base
-              10^(pKa-pH_IW),
+              1 + 10^(pKa - pH_IW),
               #4-diprotic acid
-              10^(pH_IW-pKa[1])+10^(2*pH_IW-pKa[1]-pKa[2]),
+              1 + 10^(pH_IW - min(pKa[1], pKa[2])) + 10^(2*pH_IW - pKa[1] - pKa[2]),
               #5-diprotic base
-              10^(pKa[2]-pH_IW)+10^(pKa[1]+pKa[2]-2*pH_IW),
-              #6-monoprotic acid monoprotic base (acid comes first)
-              10^(pKa[2]-pH_IW)+10^(pH_IW-pKa[1]),
-              #7-triprotic acid
-              10^(pH_IW-pKa[1])+10^(2*pH_IW-pKa[1]-pKa[2])+10^(3*pH_IW-pKa[1]-pKa[2]-pKa[3]),
-              #8-triprotic base
-              10^(pKa[3]-pH_IW)+10^(pKa[3]+pKa[2]-2*pH_IW)+10^(pKa[1]+pKa[2]+pKa[3]-3*pH_IW),
-              #9-diprotic acid monoprotic base (first two are acid)
-              10^(pKa[3]-pH_IW)+10^(pH_IW-pKa[1])+10^(2*pH_IW-pKa[1]-pKa[2]),
-              #10-diprotic base monoprotic acid (first one is acid)
-              10^(pH_IW-pKa[1])+10^(pKa[3]-pH_IW)+10^(pKa[2]+pKa[3]-2*pH_IW))
+              1 + 10^(max(pKa[1], pKa[2]) - pH_IW) + 10^(pKa[1] + pKa[2] - 2*pH_IW),
+              #6-monoprotic acid monoprotic base (acid comes first, pKa[2] = base pKa > 7)
+              1 + 10^(pKa[2] - pH_IW) + 10^(pH_IW - pKa[1]),
+              #7-all other zwitterions
+              1 + 10^(pKa[2] - pH_IW) + 10^(pH_IW - pKa[1])
+  )
 
   Y <- switch(type,
               #1-neutral
-              0,
+              1,
               #2-monoprotic acid
-              10^(pH_P-pKa),
+              1 + 10^(pH_P - pKa),
               #3-monoprotic base
-              10^(pKa-pH_P),
+              1 + 10^(pKa - pH_P),
               #4-diprotic acid
-              10^(pH_P-pKa[1])+10^(2*pH_P-pKa[1]-pKa[2]),
+              1 + 10^(pH_P - min(pKa[1], pKa[2])) + 10^(2*pH_P - pKa[1] - pKa[2]),
               #5-diprotic base
-              10^(pKa[2]-pH_P)+10^(pKa[1]+pKa[2]-2*pH_P),
+              1 + 10^(max(pKa[1], pKa[2]) - pH_P) + 10^(pKa[1] + pKa[2] - 2*pH_P),
               #6-monoprotic acid monoprotic base (acid comes first)
-              10^(pKa[2]-pH_P)+10^(pH_P-pKa[1]),
-              #7-triprotic acid
-              10^(pH_P-pKa[1])+10^(2*pH_P-pKa[1]-pKa[2])+10^(3*pH_P-pKa[1]-pKa[2]-pKa[3]),
-              #8-triprotic base
-              10^(pKa[3]-pH_P)+10^(pKa[3]+pka[2]-2*pH_P)+10^(pKa[1]+pKa[2]+pKa[3]-3*pH_P),
-              #9-diprotic acid monoprotic base (first two are acid)
-              10^(pKa[3]-pH_P)+10^(pH_P-pKa[1])+10^(2*pH_P-pKa[1]-pKa[2]),
-              #10-diprotic base monoprotic acid (first one is acid)
-              10^(pH_P-pKa[1])+10^(pKa[3]-pH_P)+10^(pKa[2]+pKa[3]-2*pH_P))
-
+              1 + 10^(pKa[2] - pH_P) + 10^(pH_P - pKa[1]),
+              #7-all other zwitterions
+              1 + 10^(pKa[2] - pH_P)+10^(pH_P - pKa[1])
+  )
   Z <- switch(type,
               #1-neutral
               1,
               #2-monoprotic acid
               1,
               #3-monoprotic base
-              10^(pKa-pH_RBC),
+              1 + 10^(pKa - pH_RBC),
               #4-diprotic acid
               1,
               #5-diprotic base
-              10^(pKa[2]-pH_RBC)+10^(pKa[1]+pKa[2]-2*pH_RBC),
-              #6-monoprotic acid monoprotic base (acid comes first)
-              10^(pKa[2]-pH_RBC)+10^(pH_RBC-pKa[1]),
-              #7-triprotic acid
-              1,
-              #8-triprotic base
-              10^(pKa[3]-pH_RBC)+10^(pKa[3]+pka[2]-2*pH_RBC)+10^(pKa[1]+pKa[2]+pKa[3]-3*pH_RBC),
-              #9-diprotic acid monoprotic base (first two are acid)
-              10^(pKa[3]-pH_RBC)+10^(pH_RBC-pKa[1])+10^(2*pH_RBC-pKa[1]-pKa[2]),
-              #10-diprotic base monoprotic acid (first one is acid)
-              10^(pH_RBC-pKa[1])+10^(pKa[3]-pH_RBC)+10^(pKa[2]+pKa[3]-2*pH_RBC))
+              1 + 10^(max(pKa[1], pKa[2])-pH_RBC) + 10^(pKa[1] + pKa[2] - 2*pH_RBC),
+              #6-monoprotic acid monoprotic base (acid comes first = pKa[1])
+              1 + 10^(pKa[2] - pH_RBC) + 10^(pH_RBC - pKa[1]),
+              #7-all other zwitterions
+              1
+  )
 
 
-  Ka_PR <- (1/fup - 1 - (P*dat_plas$f_n_l + (0.3*P + 0.7)*dat_plas$f_n_pl)/(1+Y))
-  Ka_AP <- (Kpu_bc - (1 + Z)/(1 + Y)*dat_rbc$f_iw - (P*dat_rbc$f_n_l + (0.3*P + 0.7)*dat_rbc$f_n_pl)/(1 + Y)) * (1 + Y)/dat_rbc$f_a_pl/Z
 
+  dat_tissue <- dat_tissue %>%
+    mutate(P = ifelse(tissue == "Adipose", P_OW, P_W))
+    
+  dat_tissue <- dat_tissue %>%
+    mutate(
+    )
 
-  # Assign the moderate to strong bases type_calc=1 and everything else type_calc=2
-  type_calc <- ifelse((type==3 & pKa[1]>7) | (type==5 & pKa[1] >7) | (type==6 & pKa[2] > 7) | (type==8 & pKa[1] > 7) | (type==9 & pKa[3]>7) | (type==10 & pKa[2]>7), 1,2)
+  Ka_AP = (Kpu_bc - Z/Y*fIWb - (P_W*fNLb + (0.3*P_W + 0.7)*fNPb)/Y) * Y/fAPb/(Z - 1)
+  Ka_PR <- (1/fup - 1 - (P_W*fNLp + (0.3*P_W + 0.7)*fNPp)/Y)
 
-  # Re-assign the neutrals type_calc=3
-  if(type==1){type_calc=3}  #neutrals
-
-
+           
   # Multiply by fup to get Kp rather than Kpu
-  if(type_calc==1){  #moderate to strong bases
-    Kp_all <- (dat_all$f_ew + ((1 + X)/(1 + Y))*dat_all$f_iw + ((P*dat_all$f_n_l + (0.3*P + 0.7)*dat_all$f_n_pl))/(1 + Y) + (Ka_AP*dat_all$f_a_pl*X)/(1 + Y))*fup  #non lipid
-    Kp_ad <- (dat_ad$f_ew + ((1 + X)/(1 + Y))*dat_ad$f_iw + ((P_OW*dat_ad$f_n_l + (0.3*P_OW + 0.7)*dat_ad$f_n_pl))/(1 + Y) + (Ka_AP*dat_ad$f_a_pl*X)/(1 + Y))*fup  #lipid
-  }else if(type_calc==2){   #acidic and zwitterions
-    Kp_all <- (dat_all$f_ew + ((1 + X)/(1 + Y))*dat_all$f_iw + ((P*dat_all$f_n_l + (0.3*P + 0.7)*dat_all$f_n_pl))/(1 + Y) + (Ka_PR*dat_all$AR*X)/(1 + Y))*fup  #non lipid
-    Kp_ad <- (dat_ad$f_ew + ((1 + X)/(1 + Y))*dat_ad$f_iw + ((P_OW*dat_ad$f_n_l + (0.3*P_OW + 0.7)*dat_ad$f_n_pl))/(1 + Y) + (Ka_PR*dat_ad$AR*X)/(1 + Y))*fup #lipid
-  }else{  #neutrals
-    Kp_all <- (dat_all$f_ew + ((1 + X)/(1 + Y))*dat_all$f_iw + ((P*dat_all$f_n_l + (0.3*P + 0.7)*dat_all$f_n_pl))/(1 + Y) + (Ka_PR*dat_all$LR*X)/(1 + Y))*fup  #non lipid
-    Kp_ad <- (dat_ad$f_ew + ((1 + X)/(1 + Y))*dat_ad$f_iw + ((P_OW*dat_ad$f_n_l + (0.3*P_OW + 0.7)*dat_ad$f_n_pl))/(1 + Y) + (Ka_PR*dat_ad$LR*X)/(1 + Y))*fup  #lipid
+  if(type == 1) {  # Neutral
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$LR
+
+  } else if(type %in% c(2, 4)){  #acidic / diprotic acids
+    
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
+
+  }else if(type %in% c(3, 5) & max(pKa) > 7){   # strong base with pKa > 7
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + (dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y + (dat_tissue$Ka_AP*dat_tissue$f_a_pl*(X - 1))/Y 
+
+  }else if(type %in% c(3, 5) & max(pKa) <= 7){   # weak base
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
+  }  else if(type == 6){    # Zwitterion wit pKa[2] > 7
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + ((dat_tissue$Ka_AP*dat_tissue$f_a_pl*10^(pKa[2] - pH_IW)) + 10^(pH_IW - pKa[1]))/Y 
+  } else{    # Zwitterion wit pKa[2] <= 7
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
   }
 
 
-  nms_all <- dat_all$tissue %>% substr(1,2) %>% tolower()
-  nms_all <- paste("Kp", nms_all, sep="")
-  nms <- c("Kpad",nms_all)
-  Kp <- as.list(c(Kp_ad,Kp_all))
-  names(Kp) <- nms
+  # Kp <- c(Kp_ad, Kp_all)
+  # Kp_rest <- mean(Kp)
+  # Kp <- c(Kp, Kp_rest)
+  name <- dat_tissue$tissue %>% substr(1,2) %>% tolower()
+  name <- paste("Kp", name, sep="")
 
+  result <- data.frame(name = name, Kp = Kpu_tissue)
+  return(result)
+  # nms_all <- dat_all$tissue %>% substr(1,2) %>% tolower()
+  # nms_all <- paste("Kp", nms_all, sep="")
+  # nms <- c("Kpad",nms_all, "Kprest")
+  # Kp <- as.list(c(Kp_ad,Kp_all, mean(Kp_all, Kp_ad)))
+  # names(Kp) <- nms
 
-  return(Kp)
+  # vols <- select(dat, FV) %>% pull()
+  # prod <- vols[1:11]*Kp[1:11]
+
+  # FV_rest <- 0.00726
+  # Vss <- sum(prod[1:11]) + 0.0347*(BP - (1-0.45))/0.45 + vols[13] + FV_rest*Kp[12]
+
+  # return(Vss)
 }
 
+Kpcoeff_RR(logP = 2.59, logD = 1.54, pKa = 9.4, fu = 0.53, BP = 2.06, type = 3)
