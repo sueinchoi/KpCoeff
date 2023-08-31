@@ -43,14 +43,14 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
   
   # RBC data
 
-  HCT <- 0.43 #hematocrit
+  HCT <- 0.44 #hematocrit
   
   fNLb <- 0.0017
   fNPb <- 0.0029
   fIWb <- 0.603
   fAPb <- 0.5
 
-  Kpu_bc <- (HCT - 1 + BP)/(HCT*fup)
+
 
   # Dissociation constant with tissue and AP
   # Ka_AP <- (Kpu_bc - Z/Y*fIWb - (P*fNLb + (0.3*P + 0.7)*fNPb)/Y) * Y/fAPb/(Z - 1)
@@ -128,12 +128,12 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
 
   }else if(type %in% c(3, 5) & max(pKa) > 7){   # strong base with pKa > 7
-    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + (dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y + (dat_tissue$Ka_AP*dat_tissue$f_a_pl*(X - 1))/Y 
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + (dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y + (Ka_AP*dat_tissue$f_a_pl*(X - 1))/Y 
 
   }else if(type %in% c(3, 5) & max(pKa) <= 7){   # weak base
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
   }  else if(type == 6){    # Zwitterion wit pKa[2] > 7
-    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + ((dat_tissue$Ka_AP*dat_tissue$f_a_pl*10^(pKa[2] - pH_IW)) + 10^(pH_IW - pKa[1]))/Y 
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + ((Ka_AP*dat_tissue$f_a_pl*10^(pKa[2] - pH_IW)) + 10^(pH_IW - pKa[1]))/Y 
   } else{    # Zwitterion wit pKa[2] <= 7
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
   }
@@ -162,4 +162,5 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
   # return(Vss)
 }
 
-Kpcoeff_RR(logP = 2.59, logD = 1.54, pKa = 9.4, fu = 0.53, BP = 2.06, type = 3)
+Kpcoeff_RR(logP =1.87, logD = 0.74, pKa = 9.7, fu = 0.79, BP = 1.09, type = 3)
+
