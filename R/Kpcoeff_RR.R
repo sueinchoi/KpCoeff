@@ -19,14 +19,22 @@
 
 
 library(tidyverse)
+logP <- 1.87
+pKa <- 9.67
+fup <- 0.79
+BP <- 1.09
+type <- 3
 
-Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
-  dat_tissue <- read_csv('data-raw/Tissue_comp_R&R.csv')
-  
+
+Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
+  dat_tissue <- read_csv('data-raw/Tissue_data_R&R.csv')
+  vol_tissue <- read_csv('data-raw/tissue_comp_fv.csv')
+  Volume_pl <- 3.15
+
   P_W <- 10^(logP)   # octonal:water partition coeff
-  # logP_OW <- 1.115*logP - 1.35 #oil:water partition coeff
-  # P_OW <- 10^(logP_OW)
-  P_OW <- 10^(logD)
+  logP_OW <- 1.115*logP - 1.35 #oil:water partition coeff
+  P_OW <- 10^(logP_OW)
+  # P_OW <- 10^(logD)
   Ka <- 10^(-pKa)
  
 
@@ -50,11 +58,7 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
   fIWb <- 0.603
   fAPb <- 0.5
 
-
-
-  # Dissociation constant with tissue and AP
-  # Ka_AP <- (Kpu_bc - Z/Y*fIWb - (P*fNLb + (0.3*P + 0.7)*fNPb)/Y) * Y/fAPb/(Z - 1)
-
+  Kpu_bc <- (HCT - 1 + BP)/(HCT*fup)
 
   X <- switch(type,
               #1-neutral
@@ -106,18 +110,14 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
               1
   )
 
-
-
   dat_tissue <- dat_tissue %>%
     mutate(P = ifelse(tissue == "Adipose", P_OW, P_W))
-    
-  dat_tissue <- dat_tissue %>%
-    mutate(
-    )
 
   Ka_AP = (Kpu_bc - Z/Y*fIWb - (P_W*fNLb + (0.3*P_W + 0.7)*fNPb)/Y) * Y/fAPb/(Z - 1)
   Ka_PR <- (1/fup - 1 - (P_W*fNLp + (0.3*P_W + 0.7)*fNPp)/Y)
-
+  
+  Ka_AP <- ifelse(Ka_AP<0, 0, Ka_AP)
+  Ka_PR <- ifelse(Ka_PR<0, 0, Ka_PR)
            
   # Multiply by fup to get Kp rather than Kpu
   if(type == 1) {  # Neutral
@@ -131,7 +131,7 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + (dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y + (Ka_AP*dat_tissue$f_a_pl*(X - 1))/Y 
 
   }else if(type %in% c(3, 5) & max(pKa) <= 7){   # weak base
-    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
   }  else if(type == 6){    # Zwitterion wit pKa[2] > 7
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + ((Ka_AP*dat_tissue$f_a_pl*10^(pKa[2] - pH_IW)) + 10^(pH_IW - pKa[1]))/Y 
   } else{    # Zwitterion wit pKa[2] <= 7
@@ -145,8 +145,19 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
   name <- dat_tissue$tissue %>% substr(1,2) %>% tolower()
   name <- paste("Kp", name, sep="")
 
-  result <- data.frame(name = name, Kp = Kpu_tissue)
+  result <- data.frame(name = name, Kp = Kpu_tissue, name_raw = dat_tissue$tissue)
+  # Total_volume <- left_join(result, vol_tissue, by = c("name_raw" = "tissue")) %>%
+  #   mutate(Vu = Kp*Volume) %>%
+  #   pull(Vu) %>%
+  #   sum(rm.na = TRUE)
+  # Total_volume
+  # volume_result <- Volume_pl/fup + Total_volume
   return(result)
+  # return(volume_result/70)
+
+
+
+  # return(Kpu_bc)
   # nms_all <- dat_all$tissue %>% substr(1,2) %>% tolower()
   # nms_all <- paste("Kp", nms_all, sep="")
   # nms <- c("Kpad",nms_all, "Kprest")
@@ -162,5 +173,5 @@ Kpcoeff_RR <- function(logP, logD, pKa=0, fup, BP=1, type=1, dattype=0){
   # return(Vss)
 }
 
-Kpcoeff_RR(logP =1.87, logD = 0.74, pKa = 9.7, fu = 0.79, BP = 1.09, type = 3)
+Kpcoeff_RR(logP =2.59, pKa = 9.4, fup = 0.53, BP = 2.06, type = 3)
 
