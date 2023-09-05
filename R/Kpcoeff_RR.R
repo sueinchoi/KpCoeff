@@ -19,24 +19,18 @@
 
 
 library(tidyverse)
-logP <- 1.87
-pKa <- 9.67
-fup <- 0.79
-BP <- 1.09
-type <- 3
 
+dat_tissue <- read_csv('data-raw/Tissue_data_R&R.csv')
+vol_tissue <- read_csv('data-raw/tissue_comp_fv.csv')
 
 Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
-  dat_tissue <- read_csv('data-raw/Tissue_data_R&R.csv')
-  vol_tissue <- read_csv('data-raw/tissue_comp_fv.csv')
+
   Volume_pl <- 3.15
 
   P_W <- 10^(logP)   # octonal:water partition coeff
   logP_OW <- 1.115*logP - 1.35 #oil:water partition coeff
   P_OW <- 10^(logP_OW)
-  # P_OW <- 10^(logD)
-  Ka <- 10^(-pKa)
- 
+
 
   # PH setting
 
@@ -173,5 +167,23 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
   # return(Vss)
 }
 
-Kpcoeff_RR(logP =2.59, pKa = 9.4, fup = 0.53, BP = 2.06, type = 3)
+# Validation process
 
+library(readxl)
+library(openxlsx)
+data1 <- read_excel("validation/Table2_compound specific input parameters.xlsx", sheet= 1)
+
+data2 <- read_excel("validation/Table2_compound specific input parameters.xlsx", sheet= 2)
+view(data2)
+
+sheet1 <- data1 %>% 
+  split(.$Compound) %>%
+  map(~Kpcoeff_RR(logP = .$logP, pKa = .$pKa, fup = .$fup, BP = .$BP, type = 3, dattype = 0)) %>%
+  bind_rows(.id = "compound") %>%
+  select(compound, name, Kp) %>%
+  spread(name, Kp) %>%
+  mutate_if(is.numeric, round, 2) 
+
+write.xlsx(sheet1, "validation/Kpcoeff_RR.xlsx")
+sheet2 <- data %>%
+?write.xlsx
