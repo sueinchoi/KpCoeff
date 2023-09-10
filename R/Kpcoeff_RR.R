@@ -65,9 +65,7 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
               1 + 10^(pH_IW - min(pKa[1], pKa[2])) + 10^(2*pH_IW - pKa[1] - pKa[2]),
               #5-diprotic base
               1 + 10^(max(pKa[1], pKa[2]) - pH_IW) + 10^(pKa[1] + pKa[2] - 2*pH_IW),
-              #6-monoprotic acid monoprotic base (acid comes first, pKa[2] = base pKa > 7)
-              1 + 10^(pKa[2] - pH_IW) + 10^(pH_IW - pKa[1]),
-              #7-all other zwitterions
+              #6-zwitterion
               1 + 10^(pKa[2] - pH_IW) + 10^(pH_IW - pKa[1])
   )
 
@@ -82,10 +80,8 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
               1 + 10^(pH_P - min(pKa[1], pKa[2])) + 10^(2*pH_P - pKa[1] - pKa[2]),
               #5-diprotic base
               1 + 10^(max(pKa[1], pKa[2]) - pH_P) + 10^(pKa[1] + pKa[2] - 2*pH_P),
-              #6-monoprotic acid monoprotic base (acid comes first)
-              1 + 10^(pKa[2] - pH_P) + 10^(pH_P - pKa[1]),
-              #7-all other zwitterions
-              1 + 10^(pKa[2] - pH_P)+10^(pH_P - pKa[1])
+              #6-zwitterion
+              1 + 10^(pKa[2] - pH_P) + 10^(pH_P - pKa[1])
   )
   Z <- switch(type,
               #1-neutral
@@ -98,10 +94,8 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
               1,
               #5-diprotic base
               1 + 10^(max(pKa[1], pKa[2])-pH_RBC) + 10^(pKa[1] + pKa[2] - 2*pH_RBC),
-              #6-monoprotic acid monoprotic base (acid comes first = pKa[1])
-              1 + 10^(pKa[2] - pH_RBC) + 10^(pH_RBC - pKa[1]),
-              #7-all other zwitterions
-              1
+              #6-zwitterion
+              1 + 10^(pKa[2] - pH_RBC) + 10^(pH_RBC - pKa[1])
   )
 
   dat_tissue <- dat_tissue %>%
@@ -121,12 +115,12 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
     
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
 
-  }else if(type %in% c(3, 5) & max(pKa) > 7){   # strong base with pKa > 7
-    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + (dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y + (Ka_AP*dat_tissue$f_a_pl*(X - 1))/Y 
+  }else if(type %in% c(3, 5) & max(pKa) >= 7){   # strong base with pKa > 7
+    Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + (Ka_AP*dat_tissue$f_a_pl*(X - 1))/Y 
 
-  }else if(type %in% c(3, 5) & max(pKa) <= 7){   # weak base
+  }else if(type %in% c(3, 5) & max(pKa) < 7){   # weak base
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
-  }  else if(type == 6){    # Zwitterion wit pKa[2] > 7
+  }  else if(type == 6 & pKa[2] >= 7){    # Zwitterion wit pKa[2] > 7
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + ((Ka_AP*dat_tissue$f_a_pl*10^(pKa[2] - pH_IW)) + 10^(pH_IW - pKa[1]))/Y 
   } else{    # Zwitterion wit pKa[2] <= 7
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
@@ -183,6 +177,7 @@ sheet1 <- data1 %>%
   select(compound, name, Kp) %>%
   spread(name, Kp) %>%
   mutate_if(is.numeric, round, 2) 
+
 
 write.xlsx(sheet1, "validation/Kpcoeff_RR.xlsx")
 sheet2 <- data %>%
