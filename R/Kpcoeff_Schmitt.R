@@ -1,9 +1,9 @@
 
-calcKp_Schmitt <- function(logP, pKa, fup, type = 1){
+Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1){
   #logMA is the log of membrane affinity = phosphatidylcholine:water (neutral phospholipid:water) partition coefficient;
   #we can use the available measurement of lipophilicity instead (logP or logD); from Schmitt, Walter (2008)
 
-  dat <- read.csv('Kp_calculator/data/tissue_comp_Schmitt.csv')
+  dat <- dat_Schmitt
 
   dat_all <- dat %>% filter(!tissue %in% c("RBCs", "Plasma"))  #df for all tissues except for adipose and RBCs
 

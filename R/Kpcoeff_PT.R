@@ -1,12 +1,9 @@
 #calculate tissue:plasma partition coefficients based on: Poulin and Theil http://jpharmsci.org/article/S0022-3549(16)30889-9/fulltext
 #the function returns a list of parameters that can be used directly to update the param() function in mrgsolve
 
-.libPaths("lib")
-library(dplyr)
-
-calcKp_PT <- function(logP, pKa, fup, BP=1, type=1){
+Kpcoeff_PT <- function(logP, pKa, fup, BP=1, type=1){
   
-  dat <- read.csv('Kp_calculator/data/tissue_comp_P&T.csv')
+  dat <- dat_PT
   
   dat_all <- dat %>% filter(!tissue %in% c("Plasma","Adipose","RBCs"))
   

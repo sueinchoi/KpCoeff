@@ -1,9 +1,7 @@
 
-library(tidyverse)
+Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
 
-calcKp_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
-
-  dat_tissue <- read_csv('Kp_calculator/data/tissue_data_R&R.csv')
+  dat_tissue <- dat_RR
 
   Volume_pl <- 3.15
 

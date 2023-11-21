@@ -1,7 +1,7 @@
 
-calcKp_Berez <- function(logP, pKa, fup, BP=1, type=1){
+Kpcoeff_Berez <- function(logP, pKa, fup, BP=1, type=1){
   
-  dat <- read.csv('Kp_calculator/data/tissue_comp_P&T.csv')
+  dat <- dat_Berez
 
   dat_all <- dat %>% filter(!tissue %in% c("Plasma","Adipose","RBCs"))
   
