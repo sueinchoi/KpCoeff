@@ -6,6 +6,6 @@ export(Kpcoeff_Berez)
 export(Kpcoeff_PT)
 export(Kpcoeff_RR)
 export(Kpcoeff_Schmitt)
-export(Kpcoeff_pksim)
+
 importFrom(magrittr,"%>%")
 importFrom(rlang,.data)
