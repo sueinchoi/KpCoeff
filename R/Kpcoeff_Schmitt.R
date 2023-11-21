@@ -1,29 +1,11 @@
 
-#' Prediction of tissue-prediction partition coefficient using Schmitt method
-#'
-#' @param logP Partition coefficient
-#' @param pKa Acid dissociation
-#' @param fup Plasma unbound fraction
-#' @param type Neutral/acid/base
-#' @param dattype Human physiology dataset
-#' @importFrom rlang .data
-#' @return A list of tissue partition coefficient in each organ
-#' @export
-#'
-#' @examples
-#' Kpcoeff_Schmitt(2.7, 6, 0.9, 1, 0)
-#'
-Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1, dattype=0){
+calcKp_Schmitt <- function(logP, pKa, fup, type = 1){
   #logMA is the log of membrane affinity = phosphatidylcholine:water (neutral phospholipid:water) partition coefficient;
   #we can use the available measurement of lipophilicity instead (logP or logD); from Schmitt, Walter (2008)
-  if(dattype == 0){
-    dat <- dat_Schmitt
-  } else {
-    dat <- dat_uni
-  }
 
+  dat <- read.csv('Kp_calculator/data/tissue_comp_Schmitt.csv')
 
-  dat_all <- dat[which(dat$tissue != "Plasma" & dat$tissue != "RBCs"), , drop = FALSE]
+  dat_all <- dat %>% filter(!tissue %in% c("RBCs", "Plasma"))  #df for all tissues except for adipose and RBCs
 
 
   logMA <- logP  #in case we don't have a direct logMA
@@ -63,7 +45,7 @@ Kpcoeff_Schmitt <- function(logP, pKa, fup, type = 1, dattype=0){
   else if(type==5){ # diprotic base
     F1 <- (1/(1+10^(pKa[1]-pH)))
     F2 <- (1/(1+10^(pKa[2]-pH)))
-    K_n_l <- K_n_pl*(F1*F2 + alpha*((1-F1)*F2 + F1*(1-F2) + (1-F1)*(1-F2)))
+    K_n_l <- K_n_pl*(F1*F2 + alpha*((1-F1)*F2 + F1*(1-F2)) + (1-F1)*(1-F2))
     K_a_pl <- K_n_pl*(F1*F2 + 20*((1-F1)*F2 + F1*(1-F2)) + (1-F1)*(1-F2))
   }
   else if(type==6){ # monoprotic acid monoprotic base (acid comes first)

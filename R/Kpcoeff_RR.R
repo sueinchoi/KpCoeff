@@ -1,36 +1,16 @@
 
-#' Prediction of tissue-prediction partition coefficient using R&R method
-#'
-#' @param logP Partition coefficient
-#' @param pKa Acid dissociation constant (for ampholyte or zwitterion, enter Acid pKa first)
-#' @param fup Plasma unbound fraction
-#' @param BP Blood-plasma ratio
-#' @param type Neutral(1)/acid(2)/base(3)/diprotic acid(4)/diprotic base(5)/zwitterion(ampholyte)(6)
-#' @param dattype Human physiology dataset(0 - original dataset, 1 - unified dataset)
-#' @importFrom rlang .data
-#'
-#' @return A list of tissue partition coefficient in each organ
-#' @export
-#'
-#' @examples
-#' Kpcoeff_RR(2.7, 6, 0.9, 1, 1, 0)
-#'
-#' 
-
-
 library(tidyverse)
 
-dat_tissue <- read_csv('data-raw/Tissue_data_R&R.csv')
-vol_tissue <- read_csv('data-raw/tissue_comp_fv.csv')
+calcKp_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
 
-Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
+  dat_tissue <- read_csv('Kp_calculator/data/tissue_data_R&R.csv')
 
   Volume_pl <- 3.15
 
   P_W <- 10^(logP)   # octonal:water partition coeff
-  logP_OW <- 1.115*logP - 1.35 #oil:water partition coeff
-  P_OW <- 10^(logP_OW)
+  logD<- 1.115*logP - 1.35 #oil:water partition coeff
 
+  P_OW <- 10^(logD)
 
   # PH setting
 
@@ -126,59 +106,14 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
     Kpu_tissue <- dat_tissue$f_ew + X/Y*dat_tissue$f_iw + ((dat_tissue$P*dat_tissue$f_n_l + (0.3*dat_tissue$P + 0.7)*dat_tissue$f_n_pl)/Y) + Ka_PR*dat_tissue$AR  #non lipid
   }
 
+  Kp_tissue <- as.list(Kpu_tissue * fup)
 
-  # Kp <- c(Kp_ad, Kp_all)
-  # Kp_rest <- mean(Kp)
-  # Kp <- c(Kp, Kp_rest)
   name <- dat_tissue$tissue %>% substr(1,2) %>% tolower()
   name <- paste("Kp", name, sep="")
 
-  result <- data.frame(name = name, Kp = Kpu_tissue, name_raw = dat_tissue$tissue)
-  # Total_volume <- left_join(result, vol_tissue, by = c("name_raw" = "tissue")) %>%
-  #   mutate(Vu = Kp*Volume) %>%
-  #   pull(Vu) %>%
-  #   sum(rm.na = TRUE)
-  # Total_volume
-  # volume_result <- Volume_pl/fup + Total_volume
-  return(result)
-  # return(volume_result/70)
-
-
-
-  # return(Kpu_bc)
-  # nms_all <- dat_all$tissue %>% substr(1,2) %>% tolower()
-  # nms_all <- paste("Kp", nms_all, sep="")
-  # nms <- c("Kpad",nms_all, "Kprest")
-  # Kp <- as.list(c(Kp_ad,Kp_all, mean(Kp_all, Kp_ad)))
-  # names(Kp) <- nms
-
-  # vols <- select(dat, FV) %>% pull()
-  # prod <- vols[1:11]*Kp[1:11]
-
-  # FV_rest <- 0.00726
-  # Vss <- sum(prod[1:11]) + 0.0347*(BP - (1-0.45))/0.45 + vols[13] + FV_rest*Kp[12]
-
-  # return(Vss)
+  names(Kp_tissue) <- name
+  return(Kp_tissue)
 }
 
-# Validation process
 
-library(readxl)
-library(openxlsx)
-data1 <- read_excel("validation/Table2_compound specific input parameters.xlsx", sheet= 1)
-
-data2 <- read_excel("validation/Table2_compound specific input parameters.xlsx", sheet= 2)
-view(data2)
-
-sheet1 <- data1 %>% 
-  split(.$Compound) %>%
-  map(~Kpcoeff_RR(logP = .$logP, pKa = .$pKa, fup = .$fup, BP = .$BP, type = 3, dattype = 0)) %>%
-  bind_rows(.id = "compound") %>%
-  select(compound, name, Kp) %>%
-  spread(name, Kp) %>%
-  mutate_if(is.numeric, round, 2) 
-
-
-write.xlsx(sheet1, "validation/Kpcoeff_RR.xlsx")
-sheet2 <- data %>%
-?write.xlsx
+calcKp_RR(logP = 1, pKa = 0, fup = 0.1, BP = 1, type = 1, dattype = 0)
