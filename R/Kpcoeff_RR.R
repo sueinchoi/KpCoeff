@@ -113,3 +113,4 @@ Kpcoeff_RR <- function(logP, pKa=0, fup, BP=1, type=1, dattype=0){
   return(Kp_tissue)
 }
 
+

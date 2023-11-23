@@ -65,3 +65,4 @@ Kpcoeff_Berez <- function(logP, pKa, fup, BP=1, type=1){
   
   return(Kp)
 }
+
